@@ -27,7 +27,7 @@
                         </LinearGradientBrush>
                     </Label.BorderBrush>
                 </Label>
-                <Label Content="" Height="28" HorizontalAlignment="Left" Margin="101,6,0,0" x:Name="label5" VerticalAlignment="Top" Width="112" />
+                <Label Content="" Height="28" HorizontalAlignment="Left" Margin="101,6,0,0" x:Name="CountRules" VerticalAlignment="Top" Width="112" />
                 <Label Content="" Height="28" HorizontalAlignment="Left" Margin="6,40,0,0" x:Name="label6" VerticalAlignment="Top" Width="118" />
                 <Label Content="" Height="28" HorizontalAlignment="Left" Margin="129,40,0,0" x:Name="label14" VerticalAlignment="Top" Width="84" />
             </Grid>
@@ -40,8 +40,8 @@
                 <Label Content="Правило: " Height="28" HorizontalAlignment="Left" Margin="12,6,0,0" x:Name="label7" VerticalAlignment="Top" />
                 <Label Content="-&gt;" Height="23" HorizontalAlignment="Left" Margin="158,40,0,0" x:Name="label1" VerticalAlignment="Top" Width="22" FontWeight="Normal" FontSize="12" />
                 <Button Content="Add" Height="23" HorizontalAlignment="Left" Margin="423,40,0,0" x:Name="AddPr" VerticalAlignment="Top" Width="46" Click="AddPr_Click" Cursor="Hand" FontWeight="Bold" Background="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
-                <TextBox Height="23" HorizontalAlignment="Left" Margin="12,40,0,0" x:Name="textBox1" VerticalAlignment="Top" Width="141" BorderBrush="Black" PreviewTextInput="Text_input"/>
-                <TextBox Height="23" HorizontalAlignment="Left" Margin="185,40,0,0" x:Name="textBox2" VerticalAlignment="Top" Width="233" BorderBrush="#FF0A0A0A" PreviewTextInput="Text_input_2" />
+                <TextBox Height="23" HorizontalAlignment="Left" Margin="12,40,0,0" x:Name="FirstRule" VerticalAlignment="Top" Width="141" BorderBrush="Black" PreviewTextInput="Text_input"/>
+                <TextBox Height="23" HorizontalAlignment="Left" Margin="185,40,0,0" x:Name="SecondRule" VerticalAlignment="Top" Width="233" BorderBrush="Black" PreviewTextInput="Text_input_2" />
                 <Button x:Name="BTep" Content="ε" HorizontalAlignment="Left" Margin="187,5,0,0" VerticalAlignment="Top" Width="30" Height="30" FontWeight="Bold" FontSize="14" Click="Button_Click" Background="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" Cursor="Hand"/>
                 <Button Content="@" HorizontalAlignment="Left" Margin="222,5,0,0" VerticalAlignment="Top" Width="30" Height="30" Background="{DynamicResource {x:Static SystemColors.GradientActiveCaptionBrushKey}}" Cursor="Hand" Click="AddSimbol"/>
                 <Button Content="#" HorizontalAlignment="Left" Margin="257,5,0,0" VerticalAlignment="Top" Width="30" Height="30" Background="{DynamicResource {x:Static SystemColors.GradientActiveCaptionBrushKey}}" Cursor="Hand" Click="AddSimbol"/>
@@ -62,7 +62,7 @@
             <Grid>
                 <Button Content="Очистить список" Height="35" HorizontalAlignment="Left" Margin="6,207,0,0" x:Name="button_clearAll" VerticalAlignment="Top" Width="462" Click="button_clearAll_Click" Cursor="Hand" FontWeight="Bold" Background="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
                 <Button Content="Удалить элемент" Height="35" HorizontalAlignment="Left" Margin="6,247,0,-4" x:Name="button_clear" VerticalAlignment="Top" Width="462" Click="button_clear_Click" Cursor="Hand" FontWeight="Bold" Background="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
-                <ListBox Height="200" HorizontalAlignment="Left" Margin="3,0,0,0" x:Name="listBox1" VerticalAlignment="Top" Width="465" />
+                <ListBox Height="200" HorizontalAlignment="Left" Margin="3,0,0,0" x:Name="ListRules" VerticalAlignment="Top" Width="465" />
             </Grid>
         </GroupBox>
         <Menu Height="44" HorizontalAlignment="Right" x:Name="menu1" VerticalAlignment="Top" Width="90" Background="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" FontWeight="Bold">

@@ -3,6 +3,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Collections;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Analizer
 {
@@ -18,128 +20,83 @@ namespace Analizer
 
         private void AddPr_Click(object sender, RoutedEventArgs e)
         {
-            char epsilon = Convert.ToChar(BTep.Content);
-            string pEpsilon = Convert.ToString(textBox2.Text);
-            int leng = pEpsilon.Length;
-            bool bEpsilon = false;
-            for (int l = 0; l < leng; l++)
+            if (string.IsNullOrWhiteSpace(FirstRule.Text) || string.IsNullOrWhiteSpace(SecondRule.Text))
             {
-                if (pEpsilon[l] == epsilon)
-                {
-                    bEpsilon = true;
-                }
-            }
-
-            if (textBox1.Text == "" || textBox2.Text == "" || bEpsilon && leng > 1)
-            {
-                MessageBox.Show("Недопустиммый ввод, проверьте правильнось ввода правил");              //если поля пустые
+                MessageBox.Show("Недопустиммый ввод, проверьте правильнось ввода правил"); // если поля пустые
             }
             else
             {
-                listBox1.Items.Add(textBox1.Text + "->" + textBox2.Text);
-                textBox1.Clear();
-                textBox2.Clear();
+                ListRules.Items.Add(FirstRule.Text + "->" + SecondRule.Text);
+                FirstRule.Clear();
+                SecondRule.Clear();
             }
         }
 
         private void Analizer_Click(object sender, RoutedEventArgs e)
         {
-            var anArrayOfPairedRules = new ArrayList();
             int result = 0;   // результат конечный и 4 промежуточных
-            int theNumberOfRules = listBox1.Items.Count; // всего правил в грамматике
-            if (theNumberOfRules == 0) // проверка на наличие правил
+            if (ListRules.Items.Count == 0) // проверка на наличие правил
             {
                 MessageBox.Show("Не найдены правила", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            label5.Content = theNumberOfRules; // массив строк для правил
-            for (int index = 0; index < theNumberOfRules; index++) // перебираем все правила до конца
+            CountRules.Content = ListRules.Items.Count; // массив строк для правил
+            for (int index = 0; index < ListRules.Items.Count; index++) // перебираем все правила до конца
             {
-                string rule = Convert.ToString(listBox1.Items[index]);
-                int separator = 0; //и ндекс разделителя 1 и 2 частей правила 
-                int legthRule = rule.Length; // ищем длину строки 
-                string theInterimRule = rule; // временная строка для правила
-                for (int i = 0; i < legthRule; i++) // находим символ отвечающий за то что 1 часть правила закончилась
-                {
-                    if (theInterimRule[i] == '-')
-                    {
-                        separator = i;
-                    }
-                }
-
-                string firstUnitRule = "";
-                string secontUnitRule = "";
-                for (int i = 0; i < separator; i++) // создаем 1 часть правила
-                {
-                    firstUnitRule += theInterimRule[i];
-                }
-
-                for (int i = separator + 2; i < legthRule; i++) // создаем 2 часть правила
-                {
-                    secontUnitRule += theInterimRule[i];
-                }
-
-                anArrayOfPairedRules.Add(firstUnitRule);  // добавляем в массив 1 и 2 части правила
-                anArrayOfPairedRules.Add(secontUnitRule);
-                var leftContext = 0; // обнуляем левый контекст
-                var rightContext = 0; // обнуляем правый контекст
-                int indexLeftContext = 0; // индексы правого и левого контекстов
-                int indexRightContext = 0; // начинаем с 1 если i=0, так как при умножении выйдем за пределы массива
-                var legthFirstUnitRule = firstUnitRule.Length - 1; // размер 1 части правила
-                var legthSecontUnitRule = secontUnitRule.Length - 1; // размер 2 части правила
-                var theLeftEndOfContext = false; // индекс конца контекста слева
-                var theRihtEndOfContext = false; // индекс конца контекса справа
-                bool errorRule = false;
                 var aGrammar = false;
                 var contextFreeGrammar = false;
                 var contextSensitiveGrammar = false;
-                /*
-                * проверка на А-грамматику
-                 */
+                string rule = Convert.ToString(ListRules.Items[index]);
+                int separator = rule.IndexOf('-'); // выделяем первую часть правила и вторую
+                string firstUnitRule = rule.Substring(0, separator);
+                string secontUnitRule = rule.Substring(separator + 2);
+                int leftContext = 0; // обнуляем левый контекст
+                int rightContext = 0; // обнуляем правый контекст
+                int indexLeftContext = 0; // индексы правого и левого контекстов
+                int indexRightContext = 0; // начинаем с 1 если i=0, так как при умножении выйдем за пределы массива
+                int legthFirstUnitRule = firstUnitRule.Length; // размер 1 части правила
+                int legthSecondUnitRule = secontUnitRule.Length; // размер 2 части правила
+                bool theLeftEndOfContext = false; // индекс конца контекста слева
+                bool theRihtEndOfContext = false; // индекс конца контекса справа
+                bool errorRule = false;
+                /* проверка на А-грамматику */
                 int resultAGrammar;   //результат конечный и 4 промежуточных
-                if (legthFirstUnitRule == 0 && legthSecontUnitRule == 1)
+                if (legthFirstUnitRule == 1 || legthSecondUnitRule <= 2) // A грамматика
                 {
-                    bool firstSymbol = false;
-                    bool secontSymbolFirstNonTerm = false;
-                    bool secontSymbolFirstTerm = false;
-                    for (int y = 0; y < 26; y++)
+                    if (legthFirstUnitRule == 1 && legthSecondUnitRule == 2)
                     {
-                        char symbol = Convert.ToChar(_all[y]);
-                        char symbolGrammar = Convert.ToChar(firstUnitRule[0]);
+                        //Regex regex = new Regex("([a-z][A-Z])||([A-Z][a-z])||([a-z])"); //проверить на эпсилон
+                        //MatchCollection match = regex.Matches(secontUnitRule);
+                        bool firstSymbol = false;
+                        bool secontSymbolFirstNonTerm = false;
+                        bool secontSymbolFirstTerm = false;
+                        for (int y = 0; y < 26; y++)
+                        {
+                            if (firstUnitRule.IndexOf(Convert.ToChar(_all[y])) != -1)
+                            {
+                                //проверить на следующую грамматику
+                            }
+                            char symbol = Convert.ToChar(_all[y]);
+                            char symbolGrammar = Convert.ToChar(firstUnitRule[0]);
 
-                        if (symbol == symbolGrammar)
-                        {
-                            firstSymbol = true;
-                        }
-                        if (symbol == Convert.ToChar(secontUnitRule[0]))
-                        {
-                            secontSymbolFirstNonTerm = true;
-                        }
-                        if (symbol == Convert.ToChar(secontUnitRule[1]))
-                        {
-                            secontSymbolFirstTerm = true;
-                        }
-                    }
-                    if (firstSymbol && secontSymbolFirstNonTerm && secontSymbolFirstTerm == false || firstSymbol && secontSymbolFirstNonTerm == false && secontSymbolFirstTerm)
-                    {
-                        aGrammar = true;
-                        resultAGrammar = 1;
-                        if (resultAGrammar > result)
-                        {
-                            result = resultAGrammar;
-                        }
-                    }
-                }
+                            if (symbol == symbolGrammar)
+                            {
+                                firstSymbol = true;
+                            }
 
-                if (legthFirstUnitRule == 0 && legthSecontUnitRule == 0)
-                {
-                    for (int y = 0; y < 26; y++)
-                    {
-                        char symbol = Convert.ToChar(_all[y]);
-                        char symbolGrammar = Convert.ToChar(firstUnitRule[0]);
+                            if (symbol == Convert.ToChar(secontUnitRule[0]))
+                            {
+                                secontSymbolFirstNonTerm = true;
+                            }
 
-                        if (symbol == symbolGrammar)
+                            if (symbol == Convert.ToChar(secontUnitRule[1]))
+                            {
+                                secontSymbolFirstTerm = true;
+                            }
+                        }
+
+                        if (firstSymbol && secontSymbolFirstNonTerm && secontSymbolFirstTerm == false || firstSymbol && secontSymbolFirstNonTerm == false && secontSymbolFirstTerm)
                         {
                             aGrammar = true;
                             resultAGrammar = 1;
@@ -147,19 +104,39 @@ namespace Analizer
                             {
                                 result = resultAGrammar;
                             }
-                            break;
+                        }
+                    }
+
+                    if (legthFirstUnitRule == 1 && legthSecondUnitRule == 1)
+                    {
+                        for (int y = 0; y < 26; y++)
+                        {
+                            char symbol = Convert.ToChar(_all[y]);
+                            char symbolGrammar = Convert.ToChar(firstUnitRule[0]);
+
+                            if (symbol == symbolGrammar)
+                            {
+                                aGrammar = true;
+                                resultAGrammar = 1;
+                                if (resultAGrammar > result)
+                                {
+                                    result = resultAGrammar;
+                                }
+                                break;
+                            }
+
                         }
 
                     }
-
                 }
+                
                 /*
-                    * проверка на КС-грамматику
-                    */
+                * проверка на КС-грамматику
+                */
                 if (aGrammar == false)
                 //если не А грамматика то проверяем дальше
                 {
-                    if (legthFirstUnitRule == 0 && legthSecontUnitRule >= 1)
+                    if (legthFirstUnitRule == 0 && legthSecondUnitRule >= 1)
                     {
                         for (int y = 0; y < 26; y++)
                         {
@@ -192,7 +169,7 @@ namespace Analizer
                     /*
                         * проверка на одиннаковые 1 и 2 части
                         */
-                    if (legthFirstUnitRule == legthSecontUnitRule)
+                    if (legthFirstUnitRule == legthSecondUnitRule)
                     {
                         for (int i = 0; i <= legthFirstUnitRule; i++)
                         {
@@ -215,12 +192,12 @@ namespace Analizer
                         MessageBox.Show("1 часть правил и 2 одинаковы!", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
                     }
 
-                    if (legthSecontUnitRule >= legthFirstUnitRule - 1 && errorRule == false)
+                    if (legthSecondUnitRule >= legthFirstUnitRule - 1 && errorRule == false)
                     // если размер 2 части правила больше размера 1 части правила и нет одиннаковой 1 и 2 части
                     {
                         while (theLeftEndOfContext == false) // нахождение левого контекста
                         {
-                            if (k > legthFirstUnitRule || k > legthSecontUnitRule)
+                            if (k > legthFirstUnitRule || k > legthSecondUnitRule)
                             {
                                 indexLeftContext = k - 1;
                                 break;
@@ -240,7 +217,7 @@ namespace Analizer
 
                         --k;
                         int index1 = legthFirstUnitRule;  // начинаем с конца каждого правила
-                        int index2 = legthSecontUnitRule;
+                        int index2 = legthSecondUnitRule;
                         while (theRihtEndOfContext == false) // нахождение правого контекста
                         {
                             if (index1 < 0 || index2 < 0)
@@ -264,8 +241,8 @@ namespace Analizer
 
                         index--;
                         legthFirstUnitRule++;
-                        legthSecontUnitRule++;
-                        if (legthFirstUnitRule < legthSecontUnitRule)
+                        legthSecondUnitRule++;
+                        if (legthFirstUnitRule < legthSecondUnitRule)
                         {
                             if (indexLeftContext > indexRightContext)
                             {
@@ -329,19 +306,19 @@ namespace Analizer
 
         private void button_clearAll_Click(object sender, RoutedEventArgs e)
         {
-            listBox1.Items.Clear();
+            ListRules.Items.Clear();
         }
 
         private void button_clear_Click(object sender, RoutedEventArgs e)
         {
-            int select = listBox1.SelectedIndex;
+            int select = ListRules.SelectedIndex;
             if (select == -1)
             {
                 MessageBox.Show("Не выбран элемент для удаления", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             else
             {
-                listBox1.Items.RemoveAt(listBox1.SelectedIndex);
+                ListRules.Items.RemoveAt(ListRules.SelectedIndex);
             }
         }
 
@@ -357,7 +334,7 @@ namespace Analizer
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            textBox2.Text = Convert.ToString(BTep.Content);
+            SecondRule.Text = Convert.ToString(BTep.Content);
         }
 
         private void Text_input(object sender, TextCompositionEventArgs e)
@@ -374,7 +351,7 @@ namespace Analizer
         private void AddSimbol(object sender, RoutedEventArgs e)
         {
             char epsilon = Convert.ToChar(BTep.Content);
-            string pEpsilon = Convert.ToString(textBox2.Text);
+            string pEpsilon = Convert.ToString(SecondRule.Text);
             int leng = pEpsilon.Length;
             bool bEpsilon = false;
             for (int l = 0; l < leng; l++)
@@ -391,9 +368,9 @@ namespace Analizer
                 if (button != null)
                 {
                     String symbol = Convert.ToString(button.Content);
-                    String text = textBox2.Text;
+                    String text = SecondRule.Text;
                     text += symbol;
-                    textBox2.Text = text;
+                    SecondRule.Text = text;
                 }
             }
         }
@@ -406,9 +383,9 @@ namespace Analizer
             if (button != null)
             {
                 String symbol = Convert.ToString(button.Content);
-                String text = textBox1.Text;
+                String text = FirstRule.Text;
                 text += symbol;
-                textBox1.Text = text;
+                FirstRule.Text = text;
             }
         }
     }
