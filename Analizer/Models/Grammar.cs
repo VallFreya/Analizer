@@ -115,31 +115,29 @@ namespace Analizer.Models
                 return false;
             }
 
-            rule = DeleteContext(rule); // обрезаем контекст у правила
+            while (rule.firstUnitRule.Length != 1)
+            {
+                rule = DeleteContext(rule); // обрезаем контекст у правила
+            }
 
             return CheckContextFreeGrammar(rule); // должно выглядеть как правило КС граммматики
         }
 
         /// <summary>
-        /// Удалить контекст из правила
+        /// Удалить контекст по одному символу с каждой стороны если он есть
         /// </summary>
         /// <param name="rule">Правило</param>
         /// <returns>Правило</returns>
         private (string firstUnitRule, string secontUnitRule) DeleteContext((string firstUnitRule, string secontUnitRule) rule)
         {
-            while (rule.firstUnitRule[0] == rule.secontUnitRule[0])
+            if(rule.firstUnitRule[0] == rule.secontUnitRule[0])
             {
                 rule.firstUnitRule = rule.firstUnitRule.Substring(1); // обрезать первый символ
                 rule.secontUnitRule = rule.secontUnitRule.Substring(1);
             }
-
-            for (int i = rule.firstUnitRule.Length - 1, k = rule.secontUnitRule.Length - 1; ; i--, k--)
+            
+            if (rule.firstUnitRule[rule.firstUnitRule.Length - 1] == rule.secontUnitRule[rule.secontUnitRule.Length - 1])
             {
-                if (rule.firstUnitRule[i] != rule.secontUnitRule[k])
-                {
-                    break;
-                }
-
                 rule.firstUnitRule = rule.firstUnitRule.Substring(0, rule.firstUnitRule.Length - 1); // обрезать последний символ
                 rule.secontUnitRule = rule.secontUnitRule.Substring(0, rule.secontUnitRule.Length - 1);
             }
