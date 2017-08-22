@@ -115,7 +115,7 @@ namespace Analizer.Models
                 return false;
             }
 
-            while (rule.firstUnitRule.Length != 1)
+            while (rule.firstUnitRule.Length >= 1)
             {
                 rule = DeleteContext(rule); // обрезаем контекст у правила
             }
